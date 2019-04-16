@@ -1,0 +1,97 @@
+ // mTextViewResult = findViewById(R.id.text_view_result);
+       // Button buttonParse = findViewById(R.id.button_parse);
+
+      /*  mQueue = Volley.newRequestQueue(this);
+
+          buttonParse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                jsonParse();
+            }
+        });*/
+
+      textViewResult = findViewById(R.id.text_view_result);
+
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+
+        OkHttpClient client = new OkHttpClient();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://51.68.188.157:8000/")
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        GameAPI GameAPI = retrofit.create(GameAPI.class);
+
+        Call<List<Game>> call = GameAPI.getGames();
+
+        call.enqueue(new Callback<List<Game>>() {
+            @Override
+            public void onResponse(Call<List<Game>> call, Response<List<Game>> response) {
+
+                if (!response.isSuccessful()){
+                    textViewResult.setText("Code: " + response.code());
+                    return;
+                }
+
+                List<Game> games = response.body();
+
+                for (Game game: games) {
+                    String content ="";
+                    content += "ID: " + game.getId() + "\n";
+                    content += "Titel: " + game.getTitle() + "\n";
+                    content += "Studio: " + game.getStudio() + "\n";
+                    content += "Genre: " + game.getGenre() + "\n\n";
+
+                    textViewResult.append(content);
+
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Game>> call, Throwable t) {
+                textViewResult.setText(t.getMessage());
+            }
+        });
+
+
+    }
+
+   /* private void jsonParse() {
+        String url = "http://51.68.188.157:8000/api/";
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        try {
+                            JSONArray jsonArray = response.getJSONArray("items");
+
+
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject item = jsonArray.getJSONObject(i);
+
+                                String title = item.getString("title");
+                                String studio = item.getString("studio");
+                                String genre = item.getString("genre");
+
+                                mTextViewResult.append(title + ", " + studio + ", " + genre +"\n\n" );
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        mQueue.add(request);
+    }*/
